@@ -1,0 +1,15 @@
+name = "duelo-salas"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
+
+[vars]
+# Orígenes que pueden conectarse (separados por coma). Cambiá el usuario si hace falta.
+ALLOWED_ORIGINS = "https://rvera-sys.github.io,http://localhost:8080,http://127.0.0.1:8080"
