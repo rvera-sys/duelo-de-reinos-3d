@@ -11,5 +11,5 @@ tag = "v1"
 new_sqlite_classes = ["Room"]
 
 [vars]
-# Orígenes que pueden conectarse (separados por coma). Cambiá el usuario si hace falta.
+# Orígenes que pueden conectarse (separados por coma).
 ALLOWED_ORIGINS = "https://rvera-sys.github.io,http://localhost:8080,http://127.0.0.1:8080"
