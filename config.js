@@ -1,2 +1,2 @@
-// Dirección del servidor de salas (túnel local)
-window.DUELO_WS = 'wss://selection-functionality-advisors-placing.trycloudflare.com';
+// Dirección del servidor de salas (Cloudflare Worker)
+window.DUELO_WS = 'wss://duelo-salas.leather-string.workers.dev';
