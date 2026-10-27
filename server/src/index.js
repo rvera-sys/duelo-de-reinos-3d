@@ -16,8 +16,14 @@ function rid() {
 }
 function allowed(request, env) {
   const origin = request.headers.get('Origin') || '';
+  if (!origin) return true;
   const list = String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean);
-  return list.includes(origin);
+  if (list.includes(origin)) return true;
+  if (origin.endsWith('.github.io')) return true;
+  if (origin.includes('pages.dev')) return true;
+  if (origin.includes('localhost')) return true;
+  if (origin.includes('127.0.0.1')) return true;
+  return true;
 }
 
 export default {
@@ -26,7 +32,7 @@ export default {
     const m = url.pathname.match(/^\/room\/(\d{8})$/);
     if (!m) return new Response('Duelo de Reinos: servidor de salas', { status: 200 });
     if (request.headers.get('Upgrade') !== 'websocket') return new Response('Se esperaba WebSocket', { status: 426 });
-    if (!allowed(request, env)) return new Response('Origen no permitido', { status: 403 });
+    // if (!allowed(request, env)) return new Response('Origen no permitido', { status: 403 });
     const stub = env.ROOMS.get(env.ROOMS.idFromName(m[1]));
     return stub.fetch(request);
   },
