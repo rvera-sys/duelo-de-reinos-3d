@@ -2173,8 +2173,10 @@ if(actx&&!RM)requestAnimationFrame(ambient);
 try{setup.name=localStorage.getItem('duelo.name')||'';}catch(e){}
 (function(){var h=String(location.hash||'').replace('#','');if(/^\d{8}$/.test(h)){setup.mode='online';setup.joinCode=h;}})();
 window.__dbg={G:function(){return G;},pend:function(){return pend;},NET:function(){return NET;},ME:function(){return ME;},timeUp:function(){if(G)G.endsAt=0;}};
+window.__b3={G:function(){return G;},pos:pos,fmt:fmt,curPrice:curPrice,guardAtk:guardAtk,KIND:KIND,ATTRS:ATTRS,SPECIAL:SPECIAL,SPR:SPR};
 render();
 })();
 </script>
+<script type="module" src="board3d.js?v=10"></script>
 </body>
 </html>
