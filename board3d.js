@@ -621,7 +621,7 @@ const camPos = new THREE.Vector3(9, 6, 12);
 const camTgt = new THREE.Vector3(0, 0, 0);
 const wantPos = new THREE.Vector3();
 const wantTgt = new THREE.Vector3();
-const ELEV = 0.62;    // altura de la cámara relativa a la distancia (~32°)
+const ELEV = 0.45;    // altura de la cámara relativa a la distancia (~24°)
 const FIT = 1.55;     // cuánto de la fila entra a lo ancho (1 = fila completa; >1 recorta)
 const PAN = 3.4;      // cuánto acompaña al jugador a lo largo de la fila
 
