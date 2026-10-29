@@ -16,8 +16,10 @@ const css = document.createElement('style');
 css.textContent = `
 .board-scene{height:min(calc(100vh - 168px),86vw)!important;min-height:320px;overflow:hidden}
 .board-wrap{display:none!important}
-#gl3d{position:fixed;left:0;top:0;width:100vw;height:calc(100vh - 96px);min-height:340px;pointer-events:auto;z-index:2;display:block;touch-action:none}
+#gl3d{position:fixed;left:0;top:0;width:100vw;height:calc(100vh - 96px);min-height:340px;pointer-events:auto;z-index:2;display:block;touch-action:pan-y}
 #gl3d.hide{display:none}
+body.gl3d-on .wrap{position:relative;z-index:3;pointer-events:none}
+body.gl3d-on .wrap [data-act],body.gl3d-on .wrap button,body.gl3d-on .wrap input,body.gl3d-on .wrap select,body.gl3d-on .wrap textarea,body.gl3d-on .wrap a{pointer-events:auto}
 `;
 document.head.appendChild(css);
 
@@ -625,11 +627,18 @@ const ELEV = 0.45;    // altura de la cámara relativa a la distancia (~24°)
 const FIT = 1.55;     // cuánto de la fila entra a lo ancho (1 = fila completa; >1 recorta)
 const PAN = 3.4;      // cuánto acompaña al jugador a lo largo de la fila
 
+// cuántas casillas de la fila entran a lo ancho: en vertical (celular) menos y más grandes
+function fitFactor() {
+  const rowLen = (S - 2) * TW + TD;
+  const tiles = Math.max(4.5, Math.min(11, 3.2 + camera.aspect * 5.6));
+  return Math.max(FIT, rowLen / (tiles * TW));
+}
+
 // distancia necesaria para que la fila entre a lo ancho, sea cual sea la ventana
 function camDist() {
   const halfW = Math.tan((camera.fov * Math.PI) / 360) * camera.aspect;
   const rowLen = (S - 2) * TW + TD;
-  return Math.max(7, Math.min(34, rowLen / (2 * halfW * FIT)));
+  return Math.max(7, Math.min(34, rowLen / (2 * halfW * fitFactor())));
 }
 
 function rowFrame(seg) {
@@ -653,7 +662,10 @@ function focusPoint() {
   const seg = Math.floor(((p.pos + 1) % (4 * perSide)) / perSide);
   const r = rowFrame(seg);
   const o = (t.x - r.cx) * r.tx + (t.z - r.cz) * r.tz;
-  const s = Math.max(-PAN, Math.min(PAN, o));
+  // el paneo tiene que alcanzar para que la casilla del jugador no se salga del cuadro
+  const rowLen = (S - 2) * TW + TD;
+  const lim = Math.max(PAN, rowLen / 2 - (rowLen / fitFactor()) * 0.32);
+  const s = Math.max(-lim, Math.min(lim, o));
   return {
     x: r.cx + r.tx * s, z: r.cz + r.tz * s,
     nx: r.nx, nz: r.nz, tx: r.tx, tz: r.tz
@@ -683,10 +695,22 @@ let lastSig = '';
 
 function fitCanvas() {
   const G0 = state();
-  if (!G0 || !G0.board) { canvas.classList.add('hide'); return false; }
-  const w = Math.max(320, window.innerWidth);
-  const h = Math.max(340, window.innerHeight - 96);
+  if (!G0 || !G0.board) { canvas.classList.add('hide'); document.body.classList.remove('gl3d-on'); return false; }
   canvas.classList.remove('hide');
+  document.body.classList.add('gl3d-on');
+  const w = Math.max(320, window.innerWidth);
+  const vh = window.innerHeight;
+  let top = 0, h = Math.max(340, vh - 96);
+  // en pantallas angostas el lienzo ocupa solo la franja libre entre el marcador y la barra
+  if (w < 700) {
+    const strip = document.querySelector('.strip');
+    const bar = document.querySelector('.bar');
+    top = strip ? Math.max(0, strip.getBoundingClientRect().bottom + 4) : 0;
+    const bot = bar ? Math.max(top + 240, bar.getBoundingClientRect().top - 4) : vh;
+    h = Math.max(240, Math.min(vh - top, bot - top));
+  }
+  canvas.style.top = top + 'px';
+  canvas.style.height = h + 'px';
   const pr = renderer.getPixelRatio();
   if (canvas.width !== Math.round(w * pr) || canvas.height !== Math.round(h * pr)) {
     renderer.setSize(w, h, false);
